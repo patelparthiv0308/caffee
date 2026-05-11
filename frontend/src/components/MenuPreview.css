@@ -1,0 +1,87 @@
+.menu-preview { background-color: transparent; padding: 5rem 0; }
+.menu-header  { text-align: center; }
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.menu-card {
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+.menu-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(198, 159, 80, 0.1); }
+
+.menu-card-img {
+  height: 220px;
+  background-size: cover;
+  background-position: center;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.menu-card-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.menu-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.8rem;
+}
+
+.menu-card-header h3 { font-size: 1.25rem; font-family: var(--font-heading); color: var(--text-primary); margin: 0; }
+.price             { color: var(--accent-gold); font-weight: 700; font-size: 1.1rem; }
+.menu-card-desc    { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; margin: 0; }
+
+.menu-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-bottom: 3rem;
+}
+
+.filter-btn {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+  padding: 0.6rem 1.5rem;
+  border-radius: 30px;
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.filter-btn:hover  { color: var(--text-primary); border-color: var(--accent-gold); }
+.filter-btn.active { background: var(--accent-gold); color: var(--bg-primary); border-color: var(--accent-gold); font-weight: 600; }
+
+/* ── Tablet (768px – 1024px) ── */
+@media (max-width: 1024px) {
+  .menu-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+  .menu-preview { padding: 4rem 0; }
+}
+
+/* ── Mobile (≤ 640px) ── */
+@media (max-width: 640px) {
+  .menu-grid { grid-template-columns: 1fr; gap: 1.2rem; }
+  .menu-card-img { height: 180px; }
+  .filter-btn { padding: 0.5rem 1.1rem; font-size: 0.9rem; }
+  .menu-filters { gap: 0.6rem; margin-bottom: 2rem; }
+}
+
+/* ── Small mobile (≤ 380px) ── */
+@media (max-width: 380px) {
+  .menu-card-img { height: 160px; }
+  .menu-card-content { padding: 1rem; }
+  .menu-card-header h3 { font-size: 1.1rem; }
+}
+

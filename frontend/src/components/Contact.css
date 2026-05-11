@@ -1,0 +1,107 @@
+.contact {
+  background-color: transparent;
+}
+
+.contact-container {
+  display: flex;
+  gap: 4rem;
+  align-items: flex-start;
+}
+
+.contact-info { flex: 1; }
+
+.contact-text {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin-bottom: 2.5rem;
+}
+
+.contact-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.contact-icon {
+  font-size: 1.5rem;
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.contact-item h5 { font-size: 1.1rem; color: var(--text-primary); margin-bottom: 0.2rem; font-family: var(--font-heading); }
+.contact-item p  { color: var(--text-secondary); font-size: 0.95rem; }
+
+.contact-form {
+  flex: 1;
+  padding: 2.5rem;
+  width: 100%;
+}
+
+.form-group { margin-bottom: 1.5rem; }
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  letter-spacing: 0.5px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.form-submit { width: 100%; margin-top: 1rem; }
+
+/* ── Tablet (768px – 1024px) ── */
+@media (max-width: 1024px) {
+  .contact-container { gap: 2.5rem; }
+  .contact-form { padding: 2rem; }
+}
+
+/* ── Mobile (≤ 900px) ── */
+@media (max-width: 900px) {
+  .contact-container { flex-direction: column; gap: 2rem; }
+  .contact-info { width: 100%; }
+  .contact-form { padding: 1.5rem; width: 100%; }
+  .contact-text { font-size: 1rem; }
+}
+
+/* ── Small mobile (≤ 480px) ── */
+@media (max-width: 480px) {
+  .contact-form { padding: 1.2rem 1rem; }
+  .contact-icon { width: 42px; height: 42px; font-size: 1.2rem; }
+  .contact-item h5 { font-size: 1rem; }
+  .form-group input,
+  .form-group textarea { padding: 0.8rem; font-size: 0.95rem; }
+}
+

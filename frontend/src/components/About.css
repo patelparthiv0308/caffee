@@ -1,0 +1,83 @@
+.section-padding { padding: 5rem 0; }
+
+.about-container {
+  display: flex;
+  gap: 4rem;
+  align-items: center;
+}
+
+.about-image {
+  flex: 1;
+  position: relative;
+}
+
+.about-image img {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.experience-badge {
+  position: absolute;
+  bottom: -20px;
+  right: -20px;
+  background: var(--accent-gold);
+  color: var(--bg-primary);
+  padding: 2rem;
+  border-radius: 50%;
+  width: 140px;
+  height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.experience-badge h3 { font-size: 2.5rem; margin: 0; line-height: 1; }
+.experience-badge p  { font-size: 0.9rem; font-weight: 600; text-transform: uppercase; margin: 0; }
+
+.about-content { flex: 1; }
+
+.section-subtitle {
+  color: var(--accent-gold);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 1rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+}
+
+.about-text {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+}
+
+/* ── Tablet (768px – 1024px) ── */
+@media (max-width: 1024px) {
+  .about-container { gap: 2.5rem; }
+  .experience-badge { width: 120px; height: 120px; padding: 1.5rem; bottom: -15px; right: -10px; }
+  .experience-badge h3 { font-size: 2rem; }
+  .experience-badge p  { font-size: 0.8rem; }
+  .about-text { font-size: 1rem; }
+}
+
+/* ── Mobile (≤ 900px) ── */
+@media (max-width: 900px) {
+  .about-container { flex-direction: column; gap: 2rem; }
+  .about-image { width: 100%; }
+  .experience-badge { bottom: 20px; right: 10px; width: 110px; height: 110px; padding: 1.2rem; }
+  .experience-badge h3 { font-size: 1.9rem; }
+  .experience-badge p  { font-size: 0.75rem; }
+}
+
+/* ── Small mobile (≤ 480px) ── */
+@media (max-width: 480px) {
+  .experience-badge { width: 90px; height: 90px; padding: 0.8rem; bottom: 10px; right: 10px; }
+  .experience-badge h3 { font-size: 1.5rem; }
+  .experience-badge p  { font-size: 0.65rem; }
+  .about-text { font-size: 0.95rem; }
+}
+

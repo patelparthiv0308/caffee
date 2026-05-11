@@ -1,0 +1,29 @@
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+.section-padding {
+  padding: 6rem 0;
+}
+
+/* Base button hover state if missed elsewhere */
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* ── Responsive section padding ── */
+@media (max-width: 1024px) {
+  .section-padding { padding: 5rem 0; }
+}
+@media (max-width: 768px) {
+  .section-padding { padding: 4rem 0; }
+}
+@media (max-width: 480px) {
+  .section-padding { padding: 3rem 0; }
+}
