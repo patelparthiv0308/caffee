@@ -217,6 +217,25 @@
 
 <!-- MAIN -->
 <div class="main">
+  <!-- CORS/Protocol Warning Banner -->
+  <div id="protocol-warning-banner" style="display: none; background: linear-gradient(135deg, #e23744, #b51c27); color: #fff; padding: 16px 20px; font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 500; border-radius: 8px; margin: 15px 15px 0 15px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 10px 20px rgba(226, 55, 68, 0.15); line-height: 1.6;">
+    <div style="display: flex; align-items: flex-start; gap: 12px;">
+      <span style="font-size: 1.4rem; line-height: 1;">⚠️</span>
+      <div>
+        <strong style="font-size: 1.05rem;">CORS Security Warning: Viewing as a local file (file://)</strong>
+        <br/>
+        You have opened this dashboard directly from your file system. <strong>Live wireless syncing with mobile will NOT work</strong> due to browser security restrictions (CORS).
+        <br/>
+        <span style="display: inline-block; margin-top: 8px; font-size: 0.88rem; background: rgba(0,0,0,0.15); padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);">
+          👉 <strong>To sync live:</strong> Please open the live link: 
+          <a href="https://caffee-s177.onrender.com/admin.html" style="color: #fff; text-decoration: underline; font-weight: 700; margin-left: 3px; font-size: 0.9rem;">https://caffee-s177.onrender.com/admin.html</a> 
+          or your local server: 
+          <a href="http://localhost:5173/admin.html" style="color: #fff; text-decoration: underline; font-weight: 700; margin-left: 3px; font-size: 0.9rem;">http://localhost:5173/admin.html</a>
+        </span>
+      </div>
+    </div>
+  </div>
+
   <!-- TOPBAR -->
   <div class="topbar">
     <div>
@@ -296,6 +315,13 @@
 </div>
 
 <script>
+  if (window.location.protocol === 'file:') {
+    document.addEventListener('DOMContentLoaded', () => {
+      const banner = document.getElementById('protocol-warning-banner');
+      if (banner) banner.style.display = 'block';
+    });
+  }
+
   const appKey = 'AetherCafeSyncKey17';
 
   function getOrders() {
