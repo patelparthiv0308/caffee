@@ -17,14 +17,31 @@ if (!localStorage.getItem('aether_store_open')) {
   localStorage.setItem('aether_store_open', 'true');
 }
 
+// Hex Encoder/Decoder to safely bypass IIS/ASP.NET URL security rules
+function toHex(str) {
+  let hex = '';
+  for (let i = 0; i < str.length; i++) {
+    hex += str.charCodeAt(i).toString(16).padStart(2, '0');
+  }
+  return hex;
+}
+
+function fromHex(hex) {
+  let str = '';
+  for (let i = 0; i < hex.length; i += 2) {
+    str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+  }
+  return str;
+}
+
 // Cloud Synchronizer Helper
 async function getSyncedOrders() {
   try {
     const res = await fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/orders`);
     if (!res.ok) return [];
     const text = await res.json();
-    if (!text) return [];
-    return JSON.parse(decodeURIComponent(text));
+    if (!text || text === 'testValue') return [];
+    return JSON.parse(fromHex(text));
   } catch (e) {
     console.warn("[Aether Sync] Failed to fetch from cloud:", e);
     return [];
@@ -33,8 +50,8 @@ async function getSyncedOrders() {
 
 async function syncOrders(orders) {
   try {
-    const encoded = encodeURIComponent(JSON.stringify(orders));
-    await fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/orders/${encoded}`, {
+    const hex = toHex(JSON.stringify(orders));
+    await fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/orders/${hex}`, {
       method: 'POST'
     });
   } catch (e) {
