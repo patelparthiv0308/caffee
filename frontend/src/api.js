@@ -1,7 +1,7 @@
 import fallbackProducts from './data/mockProducts';
 
 const LOCAL_BASE_URL = 'http://127.0.0.1:8000';
-const appKey = 'AetherCafeSyncKey17';
+const BIN_URL = 'https://extendsclass.com/api/json-storage/bin/fadeccf';
 
 // Determine if we are loaded over HTTPS (live site).
 const isSecureLive = window.location.protocol === 'https:';
@@ -17,31 +17,13 @@ if (!localStorage.getItem('aether_store_open')) {
   localStorage.setItem('aether_store_open', 'true');
 }
 
-// Hex Encoder/Decoder to safely bypass IIS/ASP.NET URL security rules
-function toHex(str) {
-  let hex = '';
-  for (let i = 0; i < str.length; i++) {
-    hex += str.charCodeAt(i).toString(16).padStart(2, '0');
-  }
-  return hex;
-}
-
-function fromHex(hex) {
-  let str = '';
-  for (let i = 0; i < hex.length; i += 2) {
-    str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
-  }
-  return str;
-}
-
-// Cloud Synchronizer Helper
+// Cloud Synchronizer Helper using ExtendsClass JSON Storage API
 async function getSyncedOrders() {
   try {
-    const res = await fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/orders`);
+    const res = await fetch(BIN_URL);
     if (!res.ok) return [];
-    const text = await res.json();
-    if (!text || text === 'testValue') return [];
-    return JSON.parse(fromHex(text));
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
   } catch (e) {
     console.warn("[Aether Sync] Failed to fetch from cloud:", e);
     return [];
@@ -50,9 +32,10 @@ async function getSyncedOrders() {
 
 async function syncOrders(orders) {
   try {
-    const hex = toHex(JSON.stringify(orders));
-    await fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/orders/${hex}`, {
-      method: 'POST'
+    await fetch(BIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orders)
     });
   } catch (e) {
     console.warn("[Aether Sync] Failed to sync to cloud:", e);
