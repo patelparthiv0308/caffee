@@ -1,7 +1,7 @@
 import fallbackProducts from './data/mockProducts';
 
 const LOCAL_BASE_URL = 'http://127.0.0.1:8000';
-const BIN_URL = 'https://extendsclass.com/api/json-storage/bin/fadeccf';
+const BIN_URL = 'https://api.npoint.io/45d9506e63c1ac0bf706';
 
 // Determine if we are loaded over HTTPS (live site).
 const isSecureLive = window.location.protocol === 'https:';
@@ -46,7 +46,7 @@ async function getSyncedOrders() {
     if (hasNewLocalOrders) {
       console.log("[Aether Sync] Merged new local orders to cloud.");
       fetch(BIN_URL, {
-        method: 'PUT',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(merged)
       }).catch(e => console.warn("[Aether Sync] Background merge sync failed:", e));
@@ -62,7 +62,7 @@ async function getSyncedOrders() {
 async function syncOrders(orders) {
   try {
     await fetch(BIN_URL, {
-      method: 'PUT',
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(orders)
     });

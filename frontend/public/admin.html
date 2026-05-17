@@ -322,7 +322,7 @@
     });
   }
 
-  const BIN_URL = 'https://extendsclass.com/api/json-storage/bin/fadeccf';
+  const BIN_URL = 'https://api.npoint.io/45d9506e63c1ac0bf706';
 
   function getOrders() {
     return JSON.parse(localStorage.getItem('aether_orders') || '[]');
@@ -356,7 +356,7 @@
 
       if (hasNewLocal) {
         fetch(BIN_URL, {
-          method: 'PUT',
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(merged)
         }).catch(e => console.warn("Background merge sync failed:", e));
@@ -372,7 +372,7 @@
   async function syncOrders(orders) {
     try {
       await fetch(BIN_URL, {
-        method: 'PUT',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orders)
       });
