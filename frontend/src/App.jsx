@@ -210,9 +210,7 @@ function App() {
         onClose={() => setIsAdminModalOpen(false)}
         onSuccess={() => {
           setIsAdminMode(true);
-          if (window.location.protocol !== 'https:') {
-            window.open('http://127.0.0.1:8000/api/custom-admin/', '_blank');
-          }
+          window.open('http://127.0.0.1:8000/api/custom-admin/', '_blank');
         }}
       />
       
