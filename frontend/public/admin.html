@@ -3,177 +3,342 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aether - Admin Login</title>
+  <title>AetherOS — Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;700;800&display=swap');
-
     :root {
-      --bg-primary: #0a0908;
-      --bg-secondary: #161412;
-      --bg-overlay: rgba(22, 20, 18, 0.7);
-      --accent-gold: #c69f50;
-      --accent-gold-hover: #e0c184;
-      --text-primary: #f8f6f0;
-      --text-secondary: #a39c94;
-      --border-light: rgba(198, 159, 80, 0.15);
-      
-      --font-heading: 'Outfit', sans-serif;
-      --font-body: 'Inter', sans-serif;
+      --bg: #0c0c0c;
+      --bg2: #141414;
+      --bg3: #1a1a1a;
+      --gold: #c8a84b;
+      --gold2: #e0c87a;
+      --red: #e23744;
+      --green: #22c55e;
+      --text: #f0ede8;
+      --muted: #888;
+      --border: rgba(255,255,255,0.07);
     }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; display: flex; min-height: 100vh; }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    /* SIDEBAR */
+    .sidebar {
+      width: 64px; background: var(--bg2); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; align-items: center; padding: 20px 0; gap: 8px; flex-shrink: 0;
     }
+    .sb-logo {
+      width: 38px; height: 38px; background: var(--gold); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1rem; color: #000; margin-bottom: 20px;
+    }
+    .sb-btn {
+      width: 42px; height: 42px; border-radius: 10px; border: none; background: transparent;
+      color: var(--muted); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .sb-btn:hover, .sb-btn.active { background: rgba(200,168,75,0.12); color: var(--gold); }
+    .sb-sep { width: 30px; height: 1px; background: var(--border); margin: 6px 0; }
+    .sb-btn.logout { margin-top: auto; color: var(--red); }
+    .sb-btn.logout:hover { background: rgba(226,55,68,0.12); }
 
-    body {
-      background-color: var(--bg-primary);
-      color: var(--text-primary);
-      font-family: var(--font-body);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-image: linear-gradient(rgba(10, 9, 8, 0.6), rgba(10, 9, 8, 0.75)), url('https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80');
-      background-size: cover;
-      background-position: center;
+    /* MAIN */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 28px; border-bottom: 1px solid var(--border); background: var(--bg2);
     }
+    .topbar-brand { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.2rem; }
+    .topbar-brand span { color: var(--gold); }
+    .topbar-sub { font-size: 0.7rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+    .online-badge {
+      display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--green); font-weight: 600; letter-spacing: 1px;
+    }
+    .online-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-    h1, h2, h3, h4, h5, h6 {
-      font-family: var(--font-heading);
-      font-weight: 700;
-      line-height: 1.2;
-    }
+    .content { flex: 1; display: flex; overflow: hidden; }
 
-    .admin-container {
-      width: 100%;
-      max-width: 450px;
-      padding: 3rem;
-      background: var(--bg-overlay);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
-      border: 1px solid var(--border-light);
-      border-radius: 16px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-      text-align: center;
-      animation: fadeIn 0.5s ease-out;
-    }
+    /* ORDERS PANEL */
+    .orders-panel { flex: 1; padding: 28px; overflow-y: auto; border-right: 1px solid var(--border); }
+    .panel-title { font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 800; }
+    .panel-sub { color: var(--muted); font-size: 0.85rem; margin-top: 4px; margin-bottom: 24px; }
+    .orders-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .orders-col-header { font-size: 0.75rem; letter-spacing: 1.5px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .dot-green { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+    .dot-red { width: 7px; height: 7px; border-radius: 50%; background: var(--red); }
+    .badge { font-size: 0.7rem; background: rgba(255,255,255,0.06); color: var(--muted); padding: 2px 8px; border-radius: 20px; margin-left: auto; }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .order-card {
+      background: var(--bg3); border: 1px solid var(--border); border-radius: 12px;
+      padding: 14px; margin-bottom: 12px; transition: all 0.2s;
     }
+    .order-card:hover { border-color: rgba(200,168,75,0.2); }
+    .order-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .order-name { font-weight: 600; font-size: 0.95rem; }
+    .order-date { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+    .order-complete-btn {
+      width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--green);
+      background: rgba(34,197,94,0.1); color: var(--green); font-size: 0.8rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .order-complete-btn:hover { background: var(--green); color: #000; }
+    .order-item-row { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.04); border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; }
+    .order-item-img { width: 28px; height: 28px; border-radius: 5px; object-fit: cover; background: #333; }
+    .order-item-name { font-size: 0.85rem; flex: 1; }
+    .order-item-qty { font-size: 0.75rem; color: var(--muted); background: rgba(255,255,255,0.06); padding: 2px 7px; border-radius: 10px; }
+    .order-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+    .order-address { font-size: 0.75rem; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+    .order-total { font-size: 0.95rem; font-weight: 700; color: var(--gold); }
+    .delete-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.9rem; padding: 4px; border-radius: 4px; }
+    .delete-btn:hover { color: var(--red); }
+    .empty-state { text-align: center; color: var(--muted); padding: 40px 20px; font-size: 0.9rem; }
 
-    .brand-logo {
-      font-family: var(--font-heading);
-      font-size: 2.5rem;
-      color: var(--text-primary);
-      margin-bottom: 0.5rem;
+    /* SIDEBAR RIGHT */
+    .right-panel { width: 340px; flex-shrink: 0; padding: 28px; overflow-y: auto; }
+    .right-panel h2 { font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; }
+    .form-label { font-size: 0.75rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; display: block; }
+    .form-input {
+      width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.9rem; padding: 10px 12px;
+      margin-bottom: 14px; transition: border-color 0.2s;
     }
+    .form-input:focus { outline: none; border-color: var(--gold); }
+    .brew-btn {
+      width: 100%; padding: 13px; background: var(--gold); color: #000; border: none;
+      border-radius: 8px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1rem;
+      letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; margin-top: 4px;
+    }
+    .brew-btn:hover { background: var(--gold2); transform: translateY(-1px); }
+    .success-msg { color: var(--green); font-size: 0.82rem; text-align: center; margin-top: 10px; display: none; }
 
-    .brand-logo span {
-      color: var(--accent-gold);
-    }
+    .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+    .stat-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+    .stat-label { font-size: 0.72rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+    .stat-value { font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 700; }
+    .stat-value.gold { color: var(--gold); }
+    .stat-value.green { color: var(--green); }
 
-    .subtitle {
-      color: var(--text-secondary);
-      margin-bottom: 2.5rem;
-      font-size: 0.95rem;
-    }
+    .divider { height: 1px; background: var(--border); margin: 20px 0; }
 
-    .input-group {
-      margin-bottom: 1.5rem;
-      text-align: left;
-    }
-
-    .input-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-    }
-
-    .input-group input {
-      width: 100%;
-      padding: 1rem;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-light);
-      border-radius: 8px;
-      color: var(--text-primary);
-      font-family: var(--font-body);
-      font-size: 1rem;
-      transition: all 0.3s ease;
-    }
-
-    .input-group input:focus {
-      outline: none;
-      border-color: var(--accent-gold);
-      background: rgba(255, 255, 255, 0.08);
-      box-shadow: 0 0 0 3px rgba(198, 159, 80, 0.2);
-    }
-
-    .btn-login {
-      width: 100%;
-      background-color: var(--accent-gold);
-      color: var(--bg-primary);
-      padding: 1rem;
-      border: none;
-      border-radius: 8px;
-      font-family: var(--font-heading);
-      font-weight: 600;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-top: 1rem;
-    }
-
-    .btn-login:hover {
-      background-color: var(--accent-gold-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(198, 159, 80, 0.3);
-    }
-
-    .back-link {
-      display: inline-block;
-      margin-top: 1.5rem;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-
-    .back-link:hover {
-      color: var(--accent-gold);
-    }
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
   </style>
 </head>
 <body>
 
-  <div class="admin-container">
-    <div class="brand-logo">Aether<span>.</span></div>
-    <div class="subtitle">Admin Portal Login</div>
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-logo">A</div>
+  <button class="sb-btn active" title="Orders">📦</button>
+  <div class="sb-sep"></div>
+  <button class="sb-btn" title="Products">🛍️</button>
+  <button class="sb-btn" title="Stats">📊</button>
+  <button class="sb-btn logout" title="Back to Store" onclick="window.location.href='/'">↩</button>
+</nav>
 
-    <form onsubmit="event.preventDefault(); alert('Admin panel integration coming soon!');">
-      <div class="input-group">
-        <label for="username">Username / Email</label>
-        <input type="text" id="username" placeholder="admin@aether.com" required>
-      </div>
-
-      <div class="input-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="••••••••" required>
-      </div>
-
-      <button type="submit" class="btn-login">Sign In</button>
-    </form>
-
-    <a href="/" class="back-link">← Return to Store</a>
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div>
+      <div class="topbar-brand">Aether<span>OS</span></div>
+      <div class="topbar-sub">Operational Command System</div>
+    </div>
+    <div class="online-badge">
+      <div class="online-dot"></div>
+      ONLINE
+    </div>
   </div>
 
+  <div class="content">
+    <!-- ORDERS -->
+    <div class="orders-panel">
+      <div class="panel-title">Live Orders</div>
+      <div class="panel-sub">Real-time pulse of your cafe.</div>
+
+      <div class="orders-grid">
+        <div>
+          <div class="orders-col-header">
+            <div class="dot-green"></div>
+            ACTIVE FEED
+            <span class="badge" id="active-count">0 PENDING</span>
+          </div>
+          <div id="active-orders"></div>
+        </div>
+        <div>
+          <div class="orders-col-header">
+            <div class="dot-red"></div>
+            CANCELLED
+            <span class="badge" id="cancelled-count">0 VOID</span>
+          </div>
+          <div id="cancelled-orders"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+      <!-- STATS -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Total Orders</div>
+          <div class="stat-value gold" id="stat-total">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Revenue</div>
+          <div class="stat-value green" id="stat-revenue">₹0</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- ADD PRODUCT FORM -->
+      <h2>+ Add Product</h2>
+      <label class="form-label">Product Name</label>
+      <input class="form-input" id="p-name" placeholder="e.g. Signature Espresso">
+      <label class="form-label">Price (₹)</label>
+      <input class="form-input" id="p-price" type="number" placeholder="450.00">
+      <label class="form-label">Category</label>
+      <input class="form-input" id="p-category" placeholder="Drinks, Bestseller">
+      <label class="form-label">Image URL</label>
+      <input class="form-input" id="p-image" placeholder="/image.png">
+      <label class="form-label">Description</label>
+      <input class="form-input" id="p-desc" placeholder="A rich, dark blend...">
+      <button class="brew-btn" onclick="addProduct()">☕ BREW PRODUCT</button>
+      <div class="success-msg" id="success-msg">✅ Product added successfully!</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function getOrders() {
+    return JSON.parse(localStorage.getItem('aether_orders') || '[]');
+  }
+  function saveOrders(orders) {
+    localStorage.setItem('aether_orders', JSON.stringify(orders));
+  }
+  function getProducts() {
+    return JSON.parse(localStorage.getItem('aether_products') || '[]');
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-IN', { month: 'short', day: '2-digit', year: 'numeric' }) + ', ' +
+           d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+  }
+
+  function calcTotal(items) {
+    if (!items) return 0;
+    return items.reduce((s, i) => {
+      const p = parseFloat((i.price || '0').toString().replace('₹',''));
+      return s + (p * (i.quantity || 1));
+    }, 0);
+  }
+
+  function renderOrder(order, showDelete) {
+    const items = order.items || [];
+    const total = order.total_amount || calcTotal(items);
+    const div = document.createElement('div');
+    div.className = 'order-card';
+
+    const itemsHtml = items.map(it => `
+      <div class="order-item-row">
+        <img class="order-item-img" src="${it.image || '/cappuccino.png'}" onerror="this.src='/cappuccino.png'">
+        <span class="order-item-name">${it.product_name || it.name || 'Item'}</span>
+        <span class="order-item-qty">${it.quantity || 1}x</span>
+      </div>`).join('');
+
+    div.innerHTML = `
+      <div class="order-header">
+        <div>
+          <div class="order-name">${order.customer_name || 'Customer'}</div>
+          <div class="order-date">${formatDate(order.created_at)}</div>
+        </div>
+        ${!showDelete ? `<button class="order-complete-btn" onclick="completeOrder('${order.id}')" title="Mark Complete">✓</button>` : `<button class="delete-btn" onclick="deleteOrder('${order.id}')" title="Remove">🗑</button>`}
+      </div>
+      ${itemsHtml}
+      <div class="order-footer">
+        <div class="order-address">📍 ${(order.address || '').slice(0, 30) || 'N/A'}</div>
+        <div class="order-total">₹${parseFloat(total).toFixed(2)}</div>
+      </div>`;
+    return div;
+  }
+
+  function renderOrders() {
+    const orders = getOrders();
+    const active = orders.filter(o => o.status !== 'Cancelled' && o.status !== 'completed');
+    const cancelled = orders.filter(o => o.status === 'Cancelled');
+
+    const activeEl = document.getElementById('active-orders');
+    const cancelledEl = document.getElementById('cancelled-orders');
+
+    activeEl.innerHTML = '';
+    cancelledEl.innerHTML = '';
+
+    document.getElementById('active-count').textContent = active.length + ' PENDING';
+    document.getElementById('cancelled-count').textContent = cancelled.length + ' VOID';
+
+    if (active.length === 0) activeEl.innerHTML = '<div class="empty-state">No active orders</div>';
+    active.forEach(o => activeEl.appendChild(renderOrder(o, false)));
+
+    if (cancelled.length === 0) cancelledEl.innerHTML = '<div class="empty-state">No cancelled orders</div>';
+    cancelled.forEach(o => cancelledEl.appendChild(renderOrder(o, true)));
+
+    // Stats
+    const total = orders.length;
+    const revenue = orders.filter(o => o.status !== 'Cancelled').reduce((s, o) => {
+      return s + parseFloat(o.total_amount || calcTotal(o.items || []));
+    }, 0);
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-revenue').textContent = '₹' + revenue.toFixed(0);
+  }
+
+  function completeOrder(id) {
+    const orders = getOrders().map(o => o.id === id ? { ...o, status: 'completed' } : o);
+    saveOrders(orders);
+    renderOrders();
+  }
+
+  function deleteOrder(id) {
+    const orders = getOrders().filter(o => o.id !== id);
+    saveOrders(orders);
+    renderOrders();
+  }
+
+  function addProduct() {
+    const name = document.getElementById('p-name').value.trim();
+    const price = parseFloat(document.getElementById('p-price').value);
+    const category = document.getElementById('p-category').value.trim();
+    const image = document.getElementById('p-image').value.trim();
+    const desc = document.getElementById('p-desc').value.trim();
+
+    if (!name || !price) return alert('Name aur Price zaroori hain!');
+
+    const products = getProducts();
+    const newProduct = {
+      id: 'prod_' + Math.random().toString(36).substr(2, 9),
+      name, price, category, image: image || '/cappuccino.png', desc, is_available: true
+    };
+    products.push(newProduct);
+    localStorage.setItem('aether_products', JSON.stringify(products));
+
+    document.getElementById('p-name').value = '';
+    document.getElementById('p-price').value = '';
+    document.getElementById('p-category').value = '';
+    document.getElementById('p-image').value = '';
+    document.getElementById('p-desc').value = '';
+
+    const msg = document.getElementById('success-msg');
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 3000);
+  }
+
+  // Auto-refresh every 10 seconds
+  renderOrders();
+  setInterval(renderOrders, 10000);
+</script>
 </body>
 </html>
