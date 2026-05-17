@@ -337,12 +337,35 @@
   async function getSyncedOrders() {
     try {
       const res = await fetch(BIN_URL);
-      if (!res.ok) return [];
-      const data = await res.json();
-      return Array.isArray(data) ? data : [];
+      if (!res.ok) return getOrders();
+      const cloudOrders = await res.json();
+      if (!Array.isArray(cloudOrders)) return getOrders();
+
+      const localOrders = getOrders();
+      const merged = [...cloudOrders];
+      let hasNewLocal = false;
+
+      localOrders.forEach(local => {
+        if (local && local.id && !merged.some(c => c && c.id === local.id)) {
+          merged.push(local);
+          hasNewLocal = true;
+        }
+      });
+
+      saveOrders(merged);
+
+      if (hasNewLocal) {
+        fetch(BIN_URL, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(merged)
+        }).catch(e => console.warn("Background merge sync failed:", e));
+      }
+
+      return merged;
     } catch (e) {
       console.warn("Failed to fetch from cloud:", e);
-      return [];
+      return getOrders();
     }
   }
 

@@ -17,16 +17,45 @@ if (!localStorage.getItem('aether_store_open')) {
   localStorage.setItem('aether_store_open', 'true');
 }
 
-// Cloud Synchronizer Helper using ExtendsClass JSON Storage API
+// Cloud Synchronizer Helper with a built-in Multi-Device Merger Engine
 async function getSyncedOrders() {
   try {
     const res = await fetch(BIN_URL);
-    if (!res.ok) return [];
-    const data = await res.json();
-    return Array.isArray(data) ? data : [];
+    if (!res.ok) return JSON.parse(localStorage.getItem('aether_orders') || '[]');
+    const cloudOrders = await res.json();
+    if (!Array.isArray(cloudOrders)) return JSON.parse(localStorage.getItem('aether_orders') || '[]');
+
+    // Get current local orders
+    const localOrders = JSON.parse(localStorage.getItem('aether_orders') || '[]');
+    
+    // Merge cloud orders and local orders matching by ID to prevent overwriting
+    const merged = [...cloudOrders];
+    let hasNewLocalOrders = false;
+
+    localOrders.forEach(local => {
+      if (local && local.id && !merged.some(c => c && c.id === local.id)) {
+        merged.push(local);
+        hasNewLocalOrders = true;
+      }
+    });
+
+    // Update localStorage with merged list
+    localStorage.setItem('aether_orders', JSON.stringify(merged));
+
+    // If there were local orders not yet in the cloud, sync them back
+    if (hasNewLocalOrders) {
+      console.log("[Aether Sync] Merged new local orders to cloud.");
+      fetch(BIN_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(merged)
+      }).catch(e => console.warn("[Aether Sync] Background merge sync failed:", e));
+    }
+
+    return merged;
   } catch (e) {
-    console.warn("[Aether Sync] Failed to fetch from cloud:", e);
-    return [];
+    console.warn("[Aether Sync] Failed to fetch from cloud, using local storage:", e);
+    return JSON.parse(localStorage.getItem('aether_orders') || '[]');
   }
 }
 
@@ -119,7 +148,7 @@ export const api = {
       orders = JSON.parse(localStorage.getItem('aether_orders') || '[]');
     }
 
-    const order = orders.find(o => o.id === orderId);
+    const order = orders.find(o => o && o.id === orderId);
     if (isSecureLive || (orderId && orderId.startsWith('ord_'))) {
       return order ? { status: order.status } : { status: 'pending' };
     }
@@ -165,7 +194,7 @@ export const api = {
       orders = JSON.parse(localStorage.getItem('aether_orders') || '[]');
     }
 
-    const updated = orders.map(o => o.id === orderId ? { ...o, status: 'Cancelled' } : o);
+    const updated = orders.map(o => o && o.id === orderId ? { ...o, status: 'Cancelled' } : o);
     localStorage.setItem('aether_orders', JSON.stringify(updated));
     await syncOrders(updated);
 
