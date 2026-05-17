@@ -206,6 +206,43 @@
   cursor: not-allowed;
 }
 
+/* Admin Toggle Stock Button Styles */
+.admin-toggle-stock-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.admin-toggle-stock-btn.in-stock {
+  background: rgba(36, 150, 63, 0.1);
+  color: #24963f;
+  border: 1px solid rgba(36, 150, 63, 0.4);
+}
+
+.admin-toggle-stock-btn.in-stock:hover {
+  background: #24963f;
+  color: white;
+  box-shadow: 0 4px 15px rgba(36, 150, 63, 0.3);
+}
+
+.admin-toggle-stock-btn.out-of-stock {
+  background: rgba(226, 55, 68, 0.1);
+  color: #e23744;
+  border: 1px solid rgba(226, 55, 68, 0.4);
+}
+
+.admin-toggle-stock-btn.out-of-stock:hover {
+  background: #e23744;
+  color: white;
+  box-shadow: 0 4px 15px rgba(226, 55, 68, 0.3);
+}
+
 /* Out of Stock Card Overlay Styles */
 .food-card.unavailable {
   opacity: 0.55;

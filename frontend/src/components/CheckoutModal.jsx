@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FiX, FiCheckCircle, FiTruck, FiCreditCard, FiMapPin, FiUser } from 'react-icons/fi';
 import './CheckoutModal.css';
+import { api } from '../api';
 
 const CheckoutModal = ({ isOpen, onClose, onCheckoutSuccess, cartItems }) => {
   const [step, setStep] = useState(1);
@@ -50,20 +51,8 @@ const CheckoutModal = ({ isOpen, onClose, onCheckoutSuccess, cartItems }) => {
     };
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/orders/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderPayload),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to submit order');
-      }
-      
-      const result = await response.json();
-      setOrderId(result.id);
+      const result = await api.placeOrder(orderPayload);
+      setOrderId(result.order_id || result.id);
       setStep(2); // Success step
     } catch (err) {
       console.error(err);
@@ -87,16 +76,8 @@ const CheckoutModal = ({ isOpen, onClose, onCheckoutSuccess, cartItems }) => {
     if (!orderId) return;
     setIsCancelling(true);
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/orders/${orderId}/status/`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: 'Cancelled' }),
-      });
-      if (response.ok) {
-        setIsCancelled(true);
-      }
+      await api.cancelOrder(orderId);
+      setIsCancelled(true);
     } catch (err) {
       console.error('Error cancelling order:', err);
     } finally {

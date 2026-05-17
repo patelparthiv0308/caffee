@@ -10,7 +10,8 @@ import CartModal from './components/CartModal';
 import AuthModal from './components/AuthModal';
 import AdminModal from './components/AdminModal';
 import CheckoutModal from './components/CheckoutModal';
-import { FiArrowUp, FiAlertTriangle } from 'react-icons/fi';
+import { FiArrowUp, FiAlertTriangle, FiShield } from 'react-icons/fi';
+import { api } from './api';
 
 function App() {
   const [cartItems, setCartItems] = useState([]);
@@ -42,11 +43,11 @@ function App() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isStoreOpen, setIsStoreOpen] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isAdminMode, setIsAdminMode] = useState(false);
 
   React.useEffect(() => {
     const checkStore = () => {
-      fetch('http://127.0.0.1:8000/api/store-status/')
-        .then(res => res.json())
+      api.getStoreStatus()
         .then(data => setIsStoreOpen(data.is_open))
         .catch(err => console.error("Error fetching store status:", err));
     };
@@ -159,11 +160,19 @@ function App() {
         <div className="main-content-wrap">
           <About />
           <HowToOrder />
+          {isAdminMode && (
+            <div className="admin-alert-banner container animate-fade">
+              <FiShield />
+              <span>Admin Mode Active: You can toggle product stock levels directly on the menu cards below!</span>
+              <button className="admin-exit-btn" onClick={() => setIsAdminMode(false)}>Exit Admin Mode</button>
+            </div>
+          )}
           <MenuPreview
             addToCart={addToCart}
             cartItems={cartItems}
             increment={incrementQuantity}
             decrement={decrementQuantity}
+            isAdminMode={isAdminMode}
           />
           <Contact />
         </div>
@@ -200,7 +209,10 @@ function App() {
         isOpen={isAdminModalOpen}
         onClose={() => setIsAdminModalOpen(false)}
         onSuccess={() => {
-          window.open('http://127.0.0.1:8000/api/custom-admin/', '_blank');
+          setIsAdminMode(true);
+          if (window.location.protocol !== 'https:') {
+            window.open('http://127.0.0.1:8000/api/custom-admin/', '_blank');
+          }
         }}
       />
       
@@ -221,6 +233,38 @@ function App() {
         .main-content-wrap {
           background-color: transparent;
           padding-top: 2rem;
+        }
+
+        .admin-alert-banner {
+          background: rgba(226, 55, 68, 0.1);
+          border: 1px dashed #e23744;
+          color: #e23744;
+          padding: 15px 20px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 15px;
+          font-weight: 500;
+          font-size: 0.95rem;
+          margin-top: 2rem;
+          margin-bottom: -1rem;
+        }
+
+        .admin-exit-btn {
+          background: #e23744;
+          border: none;
+          color: white;
+          padding: 6px 16px;
+          border-radius: 6px;
+          font-weight: bold;
+          cursor: pointer;
+          font-size: 0.85rem;
+          transition: all 0.2s ease;
+        }
+
+        .admin-exit-btn:hover {
+          background: #d22734;
         }
 
         .store-closed-banner {

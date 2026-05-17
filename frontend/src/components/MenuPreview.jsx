@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { FiStar, FiClock, FiPlus, FiMinus } from 'react-icons/fi';
+import { FiStar, FiClock, FiPlus, FiMinus, FiToggleLeft, FiToggleRight } from 'react-icons/fi';
 import './MenuPreview.css';
+import { api } from '../api';
 
 const categories = [
   { name: 'Bestseller', image: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?q=80&w=150&auto=format&fit=crop' },
@@ -10,7 +11,7 @@ const categories = [
   { name: 'Coffee At Home', image: 'https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=150&auto=format&fit=crop' }
 ];
 
-const MenuPreview = ({ addToCart, cartItems, increment, decrement }) => {
+const MenuPreview = ({ addToCart, cartItems, increment, decrement, isAdminMode }) => {
   const [activeCategory, setActiveCategory] = useState('Bestseller');
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,15 +21,19 @@ const MenuPreview = ({ addToCart, cartItems, increment, decrement }) => {
     return item ? item.quantity : 0;
   };
 
-  useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/products/')
-      .then(res => res.json())
+  const handleToggleStock = async (id) => {
+    await api.toggleStock(id);
+    loadProducts();
+  };
+
+  const loadProducts = () => {
+    api.getProducts()
       .then(data => {
         const formattedData = data.map(item => ({
           ...item,
-          rating: (3.5 + Math.random() * 1.4).toFixed(1), // Simulated rating
-          time: Math.floor(Math.random() * 20 + 20) + ' min', // Simulated delivery time
-          price: `₹${parseFloat(item.price || 0).toFixed(0)}`,
+          rating: item.rating || (3.5 + Math.random() * 1.4).toFixed(1), // Simulated rating
+          time: item.time || Math.floor(Math.random() * 20 + 20) + ' min', // Simulated delivery time
+          price: typeof item.price === 'string' && item.price.startsWith('₹') ? item.price : `₹${parseFloat(item.price || 0).toFixed(0)}`,
           category: typeof item.category === 'string' ? item.category.split(',').map(c => c.trim()) : (Array.isArray(item.category) ? item.category : ['All'])
         }));
         setMenuItems(formattedData);
@@ -38,7 +43,11 @@ const MenuPreview = ({ addToCart, cartItems, increment, decrement }) => {
         console.error("Error fetching products:", err);
         setLoading(false);
       });
-  }, []);
+  };
+
+  useEffect(() => {
+    loadProducts();
+  }, [isAdminMode]);
 
   const filteredItems = activeCategory === 'All'
     ? menuItems
@@ -110,7 +119,14 @@ const MenuPreview = ({ addToCart, cartItems, increment, decrement }) => {
                     </div>
                     
                     <div className="food-action">
-                      {qty > 0 ? (
+                      {isAdminMode ? (
+                        <button
+                          className={`admin-toggle-stock-btn ${item.is_available ? 'in-stock' : 'out-of-stock'}`}
+                          onClick={() => handleToggleStock(item.id)}
+                        >
+                          {item.is_available ? 'Set Out of Stock' : 'Set In Stock'}
+                        </button>
+                      ) : qty > 0 ? (
                         <div className="qty-selector">
                           <button onClick={() => decrement(item.id)}><FiMinus /></button>
                           <span>{qty}</span>
