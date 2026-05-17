@@ -2,7 +2,7 @@ import React from 'react';
 import './Footer.css';
 import { FaFacebookF, FaTwitter, FaInstagram } from 'react-icons/fa';
 
-const Footer = () => {
+const Footer = ({ openAdmin }) => {
   return (
     <footer className="footer">
       <div className="container">
@@ -23,7 +23,11 @@ const Footer = () => {
               <li><a href="#about">About</a></li>
               <li><a href="#menu">Menu</a></li>
               <li><a href="#contact">Contact</a></li>
-              <li><a href="http://127.0.0.1:8000/api/custom-admin/" target="_blank" rel="noopener noreferrer">Admin Dashboard</a></li>
+              <li>
+                <button onClick={openAdmin} className="footer-admin-btn">
+                  Admin Dashboard
+                </button>
+              </li>
             </ul>
           </div>
           <div className="footer-contact">

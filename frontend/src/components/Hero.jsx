@@ -9,23 +9,14 @@ const Hero = ({ openCart }) => {
         {/* Left: Text Content */}
         <div className="hero-content animate-slide">
           <span className="hero-badge" style={{ animationDelay: '0.2s' }}>✨ Aether Signature Bar</span>
-          <h1 className="hero-title">Experience <br/>True <span>Artisanal</span> Pairings.</h1>
+          <h1 className="hero-title">Experience <br />True <span>Artisanal</span> Pairings.</h1>
           <p className="hero-subtitle">
             Ethically sourced coffee and freshly baked pastries, meticulously crafted to elevate your daily ritual.
           </p>
           <div className="hero-cta">
             <button className="btn-primary" onClick={openCart}>Order Now</button>
-            <button className="btn-secondary" style={{ 
-              background: 'transparent', 
-              border: '1px solid rgba(198, 159, 80, 0.4)',
-              color: 'var(--accent-gold)',
-              padding: '0.8rem 2rem',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontWeight: '600',
-              marginLeft: '1rem'
-            }}
-            onClick={() => document.getElementById('menu').scrollIntoView({ behavior: 'smooth' })}
+            <button className="btn-secondary-white"
+              onClick={() => document.getElementById('menu').scrollIntoView({ behavior: 'smooth' })}
             >View Menu</button>
           </div>
         </div>
@@ -37,8 +28,8 @@ const Hero = ({ openCart }) => {
             src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80"
             alt="Artisanal Cappuccino"
             className="hero-img"
-            style={{ 
-              borderRadius: '30px', 
+            style={{
+              borderRadius: '30px',
               boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
               filter: 'brightness(0.9)'
             }}

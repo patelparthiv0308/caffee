@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { FiStar, FiClock, FiPlus, FiMinus } from 'react-icons/fi';
 import './MenuPreview.css';
 
-const categories = ['All', 'Bestseller', 'Drinks', 'Merchandise', 'Coffee At Home', 'Food', 'Cake'];
+const categories = [
+  { name: 'Bestseller', image: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?q=80&w=150&auto=format&fit=crop' },
+  { name: 'Drinks', image: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=150&auto=format&fit=crop' },
+  { name: 'Food', image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=150&auto=format&fit=crop' },
+  { name: 'Cake', image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=150&auto=format&fit=crop' },
+  { name: 'Coffee At Home', image: 'https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=150&auto=format&fit=crop' }
+];
 
 const MenuPreview = ({ addToCart, cartItems, increment, decrement }) => {
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [showAll, setShowAll] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('Bestseller');
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Helper to get quantity in cart
   const getQuantity = (id) => {
     const item = cartItems.find(i => i.id === id);
     return item ? item.quantity : 0;
@@ -19,11 +24,12 @@ const MenuPreview = ({ addToCart, cartItems, increment, decrement }) => {
     fetch('http://127.0.0.1:8000/api/products/')
       .then(res => res.json())
       .then(data => {
-        // Ensure price is formatted with '₹' as the frontend expects
         const formattedData = data.map(item => ({
           ...item,
-          price: `₹${parseFloat(item.price || 0).toFixed(0)}`, // Convert decimal string to ₹ price
-          category: typeof item.category === 'string' ? item.category.split(',').map(c => c.trim()) : (Array.isArray(item.category) ? item.category : ['All']) // Convert safely
+          rating: (3.5 + Math.random() * 1.4).toFixed(1), // Simulated rating
+          time: Math.floor(Math.random() * 20 + 20) + ' min', // Simulated delivery time
+          price: `₹${parseFloat(item.price || 0).toFixed(0)}`,
+          category: typeof item.category === 'string' ? item.category.split(',').map(c => c.trim()) : (Array.isArray(item.category) ? item.category : ['All'])
         }));
         setMenuItems(formattedData);
         setLoading(false);
@@ -34,145 +40,98 @@ const MenuPreview = ({ addToCart, cartItems, increment, decrement }) => {
       });
   }, []);
 
-  const filteredItems = activeCategory === 'All' 
-    ? menuItems 
-    : menuItems.filter(item => item.category.includes(activeCategory));
-
-  const displayedItems = showAll ? filteredItems : filteredItems.slice(0, 6);
+  const filteredItems = activeCategory === 'All'
+    ? menuItems
+    : menuItems.filter(item => item.category.some(c => c.toLowerCase() === activeCategory.toLowerCase()));
 
   return (
-    <section id="menu" className="menu-preview section-padding">
+    <section id="menu" className="menu-preview">
       <div className="container">
-        <div className="menu-header">
-          <h4 className="section-subtitle">Our Menu</h4>
-          <h2 className="section-title" style={{textAlign: 'center', marginBottom: '1.5rem'}}>Discover the Taste</h2>
-        </div>
-        
-        <div className="menu-filters">
-          {categories.map(cat => (
-            <button 
-              key={cat} 
-              className={`filter-btn ${activeCategory === cat ? 'active' : ''}`}
-              onClick={() => {
-                setActiveCategory(cat);
-                setShowAll(false);
-              }}
-            >
-              {cat}
-            </button>
-          ))}
+        <div className="collection-header">
+          <h2 className="section-title">Our Menu</h2>
+          <div className="category-scroll">
+            {categories.map(cat => (
+              <button
+                key={cat.name}
+                className={`category-pill ${activeCategory === cat.name ? 'active' : ''}`}
+                onClick={() => setActiveCategory(cat.name)}
+              >
+                <img src={cat.image} alt={cat.name} className="category-img" />
+                <span>{cat.name}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="menu-grid">
           {loading ? (
-            <div style={{ textAlign: 'center', width: '100%', gridColumn: '1 / -1', padding: '2rem' }}>
-              <p>Loading fresh products from the oven...</p>
+            <div className="loading-state">
+              <div className="shimmer-card"></div>
+              <div className="shimmer-card"></div>
+              <div className="shimmer-card"></div>
             </div>
           ) : (
-            displayedItems.map((item, index) => {
+            filteredItems.map((item, index) => {
               const qty = getQuantity(item.id);
+              const isBestseller = item.category.includes('Bestseller');
+              
               return (
-                <div 
-                  key={item.id} 
-                  className={`menu-card glass-panel animate-fade ${!item.is_available ? 'out-of-stock' : ''}`} 
-                  style={{ 
-                    animationDelay: `${index * 0.1}s`,
-                    opacity: item.is_available ? 1 : 0.7 
-                  }}
+                <div
+                  key={item.id}
+                  className={`food-card animate-slide ${!item.is_available ? 'unavailable' : ''}`}
+                  style={{ animationDelay: `${index * 0.05}s` }}
                 >
-                  <div className="menu-card-img" style={{ 
-                    backgroundImage: `url(${item.image})`, 
-                    filter: item.is_available ? 'none' : 'grayscale(1) brightness(0.7)',
-                    transition: 'all 0.5s ease'
-                  }}></div>
-                  <div className="menu-card-content">
-                    <div className="menu-card-header">
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <h3 style={{ fontSize: '1.2rem', fontWeight: '800' }}>{item.name}</h3>
-                        {!item.is_available && <span style={{ color: '#ff4444', fontSize: '0.6rem', fontWeight: '900', letterSpacing: '2px', marginTop: '4px' }}>OUT OF STOCK</span>}
-                      </div>
-                      <span className="price" style={{ color: '#d4af37', fontWeight: '800' }}>{item.price}</span>
+                  <div className="food-img-wrapper">
+                    <img src={item.image} alt={item.name} loading="lazy" />
+                    {isBestseller && <span className="bestseller-tag">Bestseller</span>}
+                    <div className="delivery-time-tag">
+                      <FiClock /> {item.time}
                     </div>
-                    <p className="menu-card-desc" style={{ marginBottom: '1.5rem', fontSize: '0.85rem', color: '#a39c94' }}>{item.desc}</p>
-                    
-                    {qty > 0 ? (
-                      <div className="quantity-controls" style={{ 
-                        marginTop: 'auto', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'space-between',
-                        background: 'rgba(212, 175, 55, 0.1)',
-                        borderRadius: '8px',
-                        padding: '0.3rem',
-                        border: '1px solid rgba(212, 175, 55, 0.3)'
-                      }}>
-                        <button 
-                          className="qty-btn" 
-                          style={{ 
-                            background: '#d4af37', 
-                            color: '#000', 
-                            border: 'none', 
-                            borderRadius: '5px', 
-                            width: '30px', 
-                            height: '30px', 
-                            cursor: 'pointer',
-                            fontWeight: 'bold'
-                          }}
-                          onClick={() => decrement(item.id)}
-                        >
-                          -
-                        </button>
-                        <span style={{ fontWeight: 'bold', color: '#d4af37' }}>{qty}</span>
-                        <button 
-                          className="qty-btn" 
-                          style={{ 
-                            background: '#d4af37', 
-                            color: '#000', 
-                            border: 'none', 
-                            borderRadius: '5px', 
-                            width: '30px', 
-                            height: '30px', 
-                            cursor: 'pointer',
-                            fontWeight: 'bold'
-                          }}
-                          onClick={() => increment(item.id)}
-                        >
-                          +
-                        </button>
+                    {!item.is_available && (
+                      <div className="sold-out-overlay animate-fade">
+                        <div className="sold-out-badge">
+                          Out Of Stock
+                        </div>
                       </div>
-                    ) : (
-                      <button 
-                        className="btn-primary" 
-                        style={{ 
-                          marginTop: 'auto', 
-                          padding: '0.6rem 1rem',
-                          background: item.is_available ? '#d4af37' : '#444',
-                          cursor: item.is_available ? 'pointer' : 'not-allowed',
-                          opacity: item.is_available ? 1 : 0.5
-                        }} 
-                        onClick={() => item.is_available && addToCart(item)}
-                        disabled={!item.is_available}
-                      >
-                        {item.is_available ? 'Add to Cart' : 'Out of Stock'}
-                      </button>
                     )}
+                  </div>
+                  
+                  <div className="food-details">
+                    <div className="food-header">
+                      <h3 className="food-name">{item.name}</h3>
+                      <div className="rating-badge">
+                        {item.rating} <FiStar />
+                      </div>
+                    </div>
+                    
+                    <div className="food-meta">
+                      <p className="food-type">{item.category.filter(c => c !== 'All' && c !== 'Bestseller').join(', ')}</p>
+                      <p className="food-price-for-two">{item.price} for one</p>
+                    </div>
+                    
+                    <div className="food-action">
+                      {qty > 0 ? (
+                        <div className="qty-selector">
+                          <button onClick={() => decrement(item.id)}><FiMinus /></button>
+                          <span>{qty}</span>
+                          <button onClick={() => increment(item.id)}><FiPlus /></button>
+                        </div>
+                      ) : (
+                        <button 
+                          className="add-to-cart-btn"
+                          onClick={() => item.is_available && addToCart(item)}
+                          disabled={!item.is_available}
+                        >
+                          {item.is_available ? 'Add +' : 'Out of Stock'}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
             })
           )}
         </div>
-        
-        {filteredItems.length > 6 && (
-          <div className="menu-actions" style={{ textAlign: 'center', marginTop: '3rem' }}>
-            <button 
-              className="btn-primary" 
-              onClick={() => setShowAll(!showAll)}
-            >
-              {showAll ? 'View Less' : 'View All in ' + activeCategory}
-            </button>
-          </div>
-        )}
       </div>
     </section>
   );

@@ -1,0 +1,72 @@
+{% extends "admin/base.html" %}
+
+{% load i18n %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    body {
+        background-image: url('https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=2000&auto=format&fit=crop'); /* Coffee background */
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+    }
+    
+    /* Make panels translucent to see the background */
+    #header {
+        background: rgba(18, 18, 18, 0.85) !important;
+    }
+    
+    #content {
+        background: rgba(255, 255, 255, 0.85) !important;
+        border-radius: 8px;
+        margin: 20px auto;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        max-width: 1200px;
+    }
+    
+    /* Dark mode adjustments */
+    @media (prefers-color-scheme: dark) {
+        #content {
+            background: rgba(30, 30, 30, 0.85) !important;
+            color: #fff;
+        }
+        .module {
+            background: rgba(40, 40, 40, 0.9) !important;
+        }
+        #changelist {
+            background: rgba(30, 30, 30, 0.85) !important;
+        }
+    }
+    
+    .module h2, .module caption, .inline-group h2 {
+        background: rgba(40, 40, 40, 0.9) !important;
+    }
+    
+    div.breadcrumbs {
+        background: rgba(18, 18, 18, 0.85) !important;
+        border-radius: 4px;
+        margin-top: 10px;
+    }
+    
+    /* Additional overrides for transparent feeling */
+    #changelist-filter {
+        background: rgba(255, 255, 255, 0.1) !important;
+    }
+    @media (prefers-color-scheme: dark) {
+        #changelist-filter {
+            background: rgba(0, 0, 0, 0.2) !important;
+        }
+    }
+</style>
+{% endblock %}
