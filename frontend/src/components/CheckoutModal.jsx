@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiX, FiCheckCircle, FiTruck, FiCreditCard, FiMapPin, FiUser } from 'react-icons/fi';
 import './CheckoutModal.css';
 import { api } from '../api';
@@ -15,6 +15,40 @@ const CheckoutModal = ({ isOpen, onClose, onCheckoutSuccess, cartItems }) => {
   const [paymentStatus, setPaymentStatus] = useState('');
   const [isCancelling, setIsCancelling] = useState(false);
   const [isCancelled, setIsCancelled] = useState(false);
+  const [liveStatus, setLiveStatus] = useState('pending');
+
+  useEffect(() => {
+    if (!orderId) return;
+
+    const fetchStatus = async () => {
+      try {
+        const res = await api.getOrderStatus(orderId);
+        if (res && res.status) {
+          setLiveStatus(res.status);
+          if (res.status === 'Cancelled') {
+            setIsCancelled(true);
+          }
+        }
+      } catch (e) {
+        console.error("Error fetching order status:", e);
+      }
+    };
+    fetchStatus();
+
+    const interval = setInterval(fetchStatus, 3000);
+    return () => clearInterval(interval);
+  }, [orderId]);
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'completed':
+        return <span className="detail-value status" style={{ color: '#24963f', fontWeight: 'bold' }}>Delivered ✓</span>;
+      case 'Cancelled':
+        return <span className="detail-value status" style={{ color: '#e23744', fontWeight: 'bold' }}>Cancelled ✕</span>;
+      default:
+        return <span className="detail-value status" style={{ color: '#ffb300', fontWeight: 'bold' }}>Preparing...</span>;
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -255,7 +289,7 @@ const CheckoutModal = ({ isOpen, onClose, onCheckoutSuccess, cartItems }) => {
                   </div>
                   <div className="detail-row">
                     <span>Status</span>
-                    <span className="detail-value status">Preparing...</span>
+                    {getStatusLabel(liveStatus)}
                   </div>
                 </div>
                 
