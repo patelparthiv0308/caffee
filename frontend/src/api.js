@@ -1,10 +1,9 @@
 import fallbackProducts from './data/mockProducts';
 
 const LOCAL_BASE_URL = 'http://127.0.0.1:8000';
+const appKey = 'AetherCafeSyncKey17';
 
 // Determine if we are loaded over HTTPS (live site).
-// If we are on secure HTTPS, we MUST use client-side database
-// to prevent browser "Mixed Content" block errors!
 const isSecureLive = window.location.protocol === 'https:';
 
 // Initialize localStorage databases if not present
@@ -16,6 +15,31 @@ if (!localStorage.getItem('aether_orders')) {
 }
 if (!localStorage.getItem('aether_store_open')) {
   localStorage.setItem('aether_store_open', 'true');
+}
+
+// Cloud Synchronizer Helper
+async function getSyncedOrders() {
+  try {
+    const res = await fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/orders`);
+    if (!res.ok) return [];
+    const text = await res.json();
+    if (!text) return [];
+    return JSON.parse(decodeURIComponent(text));
+  } catch (e) {
+    console.warn("[Aether Sync] Failed to fetch from cloud:", e);
+    return [];
+  }
+}
+
+async function syncOrders(orders) {
+  try {
+    const encoded = encodeURIComponent(JSON.stringify(orders));
+    await fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/orders/${encoded}`, {
+      method: 'POST'
+    });
+  } catch (e) {
+    console.warn("[Aether Sync] Failed to sync to cloud:", e);
+  }
 }
 
 export const api = {
@@ -49,18 +73,30 @@ export const api = {
   },
 
   placeOrder: async (orderData) => {
+    let orders = [];
+    try {
+      orders = await getSyncedOrders();
+    } catch (e) {}
+    if (!orders || !Array.isArray(orders)) {
+      orders = JSON.parse(localStorage.getItem('aether_orders') || '[]');
+    }
+
+    const newOrder = {
+      ...orderData,
+      id: 'ord_' + Math.random().toString(36).substr(2, 9),
+      status: 'pending',
+      created_at: new Date().toISOString()
+    };
+    orders.push(newOrder);
+    localStorage.setItem('aether_orders', JSON.stringify(orders));
+    
+    // Sync to cloud
+    await syncOrders(orders);
+
     if (isSecureLive) {
-      const orders = JSON.parse(localStorage.getItem('aether_orders') || '[]');
-      const newOrder = {
-        ...orderData,
-        id: 'ord_' + Math.random().toString(36).substr(2, 9),
-        status: 'pending',
-        created_at: new Date().toISOString()
-      };
-      orders.push(newOrder);
-      localStorage.setItem('aether_orders', JSON.stringify(orders));
       return { success: true, order_id: newOrder.id };
     }
+
     try {
       const res = await fetch(`${LOCAL_BASE_URL}/api/orders/`, {
         method: 'POST',
@@ -70,23 +106,21 @@ export const api = {
       if (!res.ok) throw new Error();
       return await res.json();
     } catch (e) {
-      const orders = JSON.parse(localStorage.getItem('aether_orders') || '[]');
-      const newOrder = {
-        ...orderData,
-        id: 'ord_' + Math.random().toString(36).substr(2, 9),
-        status: 'pending',
-        created_at: new Date().toISOString()
-      };
-      orders.push(newOrder);
-      localStorage.setItem('aether_orders', JSON.stringify(orders));
       return { success: true, order_id: newOrder.id };
     }
   },
 
   getOrderStatus: async (orderId) => {
+    let orders = [];
+    try {
+      orders = await getSyncedOrders();
+    } catch (e) {}
+    if (!orders || !Array.isArray(orders)) {
+      orders = JSON.parse(localStorage.getItem('aether_orders') || '[]');
+    }
+
+    const order = orders.find(o => o.id === orderId);
     if (isSecureLive || (orderId && orderId.startsWith('ord_'))) {
-      const orders = JSON.parse(localStorage.getItem('aether_orders') || '[]');
-      const order = orders.find(o => o.id === orderId);
       return order ? { status: order.status } : { status: 'pending' };
     }
     try {
@@ -94,8 +128,6 @@ export const api = {
       if (!res.ok) throw new Error();
       return await res.json();
     } catch (e) {
-      const orders = JSON.parse(localStorage.getItem('aether_orders') || '[]');
-      const order = orders.find(o => o.id === orderId);
       return order ? { status: order.status } : { status: 'pending' };
     }
   },
@@ -125,9 +157,17 @@ export const api = {
   },
 
   cancelOrder: async (orderId) => {
-    const orders = JSON.parse(localStorage.getItem('aether_orders') || '[]');
+    let orders = [];
+    try {
+      orders = await getSyncedOrders();
+    } catch (e) {}
+    if (!orders || !Array.isArray(orders)) {
+      orders = JSON.parse(localStorage.getItem('aether_orders') || '[]');
+    }
+
     const updated = orders.map(o => o.id === orderId ? { ...o, status: 'Cancelled' } : o);
     localStorage.setItem('aether_orders', JSON.stringify(updated));
+    await syncOrders(updated);
 
     if (isSecureLive || (orderId && orderId.startsWith('ord_'))) {
       return { success: true };

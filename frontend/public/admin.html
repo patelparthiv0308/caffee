@@ -296,6 +296,8 @@
 </div>
 
 <script>
+  const appKey = 'AetherCafeSyncKey17';
+
   function getOrders() {
     return JSON.parse(localStorage.getItem('aether_orders') || '[]');
   }
@@ -304,6 +306,30 @@
   }
   function getProducts() {
     return JSON.parse(localStorage.getItem('aether_products') || '[]');
+  }
+
+  async function getSyncedOrders() {
+    try {
+      const res = await fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/orders`);
+      if (!res.ok) return [];
+      const text = await res.json();
+      if (!text) return [];
+      return JSON.parse(decodeURIComponent(text));
+    } catch (e) {
+      console.warn("Failed to fetch from cloud:", e);
+      return [];
+    }
+  }
+
+  async function syncOrders(orders) {
+    try {
+      const encoded = encodeURIComponent(JSON.stringify(orders));
+      await fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/orders/${encoded}`, {
+        method: 'POST'
+      });
+    } catch (e) {
+      console.warn("Failed to sync to cloud:", e);
+    }
   }
 
   function formatDate(iso) {
@@ -350,8 +376,20 @@
     return div;
   }
 
-  function renderOrders() {
-    const orders = getOrders();
+  async function renderOrders() {
+    let orders = [];
+    try {
+      const cloud = await getSyncedOrders();
+      if (cloud && Array.isArray(cloud) && cloud.length > 0) {
+        orders = cloud;
+        saveOrders(orders);
+      } else {
+        orders = getOrders();
+      }
+    } catch (e) {
+      orders = getOrders();
+    }
+
     const active = orders.filter(o => o.status !== 'Cancelled' && o.status !== 'completed');
     const cancelled = orders.filter(o => o.status === 'Cancelled');
 
@@ -379,16 +417,18 @@
     document.getElementById('stat-revenue').textContent = '₹' + revenue.toFixed(0);
   }
 
-  function completeOrder(id) {
+  async function completeOrder(id) {
     const orders = getOrders().map(o => o.id === id ? { ...o, status: 'completed' } : o);
     saveOrders(orders);
-    renderOrders();
+    await syncOrders(orders);
+    await renderOrders();
   }
 
-  function deleteOrder(id) {
+  async function deleteOrder(id) {
     const orders = getOrders().filter(o => o.id !== id);
     saveOrders(orders);
-    renderOrders();
+    await syncOrders(orders);
+    await renderOrders();
   }
 
   function addProduct() {
@@ -419,9 +459,9 @@
     setTimeout(() => msg.style.display = 'none', 3000);
   }
 
-  // Auto-refresh every 10 seconds
+  // Auto-refresh every 5 seconds for snappy updates
   renderOrders();
-  setInterval(renderOrders, 10000);
+  setInterval(renderOrders, 5000);
 </script>
 </body>
 </html>
