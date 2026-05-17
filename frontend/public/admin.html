@@ -46,10 +46,36 @@
     .topbar {
       display: flex; align-items: center; justify-content: space-between;
       padding: 16px 28px; border-bottom: 1px solid var(--border); background: var(--bg2);
+      gap: 15px;
     }
     .topbar-brand { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.2rem; }
     .topbar-brand span { color: var(--gold); }
     .topbar-sub { font-size: 0.7rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+    
+    .topbar-actions {
+      display: flex; align-items: center; gap: 16px;
+    }
+    .return-home-btn {
+      background: rgba(200, 168, 75, 0.08);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .return-home-btn:hover {
+      background: var(--gold);
+      color: #000;
+      box-shadow: 0 4px 12px rgba(200, 168, 75, 0.25);
+    }
     .online-badge {
       display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--green); font-weight: 600; letter-spacing: 1px;
     }
@@ -120,6 +146,57 @@
 
     .divider { height: 1px; background: var(--border); margin: 20px 0; }
 
+    /* RESPONSIVE DESIGN (MOBILE & TABLET) */
+    @media (max-width: 900px) {
+      body { flex-direction: column; }
+      
+      .sidebar {
+        width: 100%;
+        height: 60px;
+        flex-direction: row;
+        padding: 10px 20px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        justify-content: space-around;
+        gap: 15px;
+      }
+      .sb-logo { margin-bottom: 0; display: none; }
+      .sidebar .sb-sep { display: none; }
+      .sb-btn.logout { margin-top: 0; }
+
+      .topbar {
+        padding: 14px 20px;
+      }
+      .topbar-sub { display: none; }
+      .topbar-actions { gap: 10px; }
+      .return-home-btn { padding: 6px 12px; font-size: 0.75rem; }
+
+      .content {
+        flex-direction: column;
+        overflow-y: auto;
+      }
+      
+      .orders-panel {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 20px;
+        overflow-y: visible;
+        flex: none;
+      }
+      
+      .orders-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+
+      .right-panel {
+        width: 100%;
+        padding: 20px;
+        overflow-y: visible;
+        flex: none;
+      }
+    }
+
     /* Scrollbar */
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -135,7 +212,7 @@
   <div class="sb-sep"></div>
   <button class="sb-btn" title="Products">🛍️</button>
   <button class="sb-btn" title="Stats">📊</button>
-  <button class="sb-btn logout" title="Back to Store" onclick="window.location.href='/'">↩</button>
+  <button class="sb-btn logout" title="Return to Homepage" onclick="window.location.href='/'">↩</button>
 </nav>
 
 <!-- MAIN -->
@@ -146,9 +223,15 @@
       <div class="topbar-brand">Aether<span>OS</span></div>
       <div class="topbar-sub">Operational Command System</div>
     </div>
-    <div class="online-badge">
-      <div class="online-dot"></div>
-      ONLINE
+    
+    <div class="topbar-actions">
+      <a href="/" class="return-home-btn">
+        <span>←</span> Return to Homepage
+      </a>
+      <div class="online-badge">
+        <div class="online-dot"></div>
+        ONLINE
+      </div>
     </div>
   </div>
 
